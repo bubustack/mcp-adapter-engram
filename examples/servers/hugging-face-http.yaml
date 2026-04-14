@@ -1,0 +1,17 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-hugging-face-http"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: streamable_http
+    server:
+      baseURL: "https://huggingface.co/mcp"
+  mcp:
+    initClientCapabilities: {}

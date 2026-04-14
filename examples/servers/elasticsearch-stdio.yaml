@@ -1,0 +1,23 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-elasticsearch-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/elasticsearch@sha256:9c978b8277e32be0229e0c2f5c631e4106dd1c9c955ec361814588688582bcfd"
+      imagePullPolicy: IfNotPresent
+      command:
+        - stdio
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "elasticsearch-mcp-secrets"

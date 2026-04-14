@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-stackhawk-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/stackhawk@sha256:18a9cee31c2cd568da3fd2885a1d01ca53be7fe14cd3d6975cc35667ce124436"
+      imagePullPolicy: IfNotPresent
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "stackhawk-mcp-secrets"

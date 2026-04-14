@@ -1,0 +1,18 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-terraform-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "hashicorp/terraform-mcp-server@sha256:ea936a266f0133651acb579dd827953a3a580d2962f18be4dc23d00ed599dbce"
+      imagePullPolicy: IfNotPresent
+  mcp:
+    initClientCapabilities: {}

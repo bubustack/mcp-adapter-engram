@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-apify-http"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: streamable_http
+    server:
+      baseURL: "https://mcp.apify.com"
+      headersFromSecret:
+        Authorization: "server:APIFY_API_KEY"
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "apify-mcp-secrets"

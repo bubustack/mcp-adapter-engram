@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-dynatrace-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/dynatrace-mcp-server@sha256:101536db9b2538162dbb1566b96b10bbb513b70442785a97155d5376344de0ec"
+      imagePullPolicy: IfNotPresent
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "dynatrace-mcp-secrets"

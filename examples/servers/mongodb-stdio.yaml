@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-mongodb-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/mongodb@sha256:30c41cedbdc038e59cb707be065a83e4672d323afc1a585d6aacd88dfd5f01e7"
+      imagePullPolicy: IfNotPresent
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "mongodb-mcp-secrets"

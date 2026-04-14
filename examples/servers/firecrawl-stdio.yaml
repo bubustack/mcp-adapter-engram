@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-firecrawl-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/firecrawl@sha256:1c6a307297715be07c1646b40527bdaf7cdf0141b1a50c55f2293e5380c4acaa"
+      imagePullPolicy: IfNotPresent
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "firecrawl-mcp-secrets"

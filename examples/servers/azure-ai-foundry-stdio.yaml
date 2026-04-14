@@ -1,0 +1,21 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-azure-ai-foundry-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "mcr.microsoft.com/azure-sdk/azure-mcp@sha256:28ac4216fb19897a4af5b05bf88616da5dceb7ecc1be643a2ecd412e0476fc85"
+      imagePullPolicy: IfNotPresent
+      command:
+        - server
+        - start
+  mcp:
+    initClientCapabilities: {}

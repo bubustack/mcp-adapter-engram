@@ -1,0 +1,12 @@
+.git
+.github
+bin
+dist
+**/*.md
+**/*.yaml
+**/*.yml
+**/*.sh
+**/*.env
+**/*.test
+**/*.txt
+examples/*

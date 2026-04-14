@@ -1,0 +1,23 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-stripe-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/stripe@sha256:685405139d773a289700abf5aac8cf42f2f3d941eeaed8e9d46594bd97b3a6b1"
+      imagePullPolicy: IfNotPresent
+      args:
+        - --tools=all
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "stripe-mcp-secrets"

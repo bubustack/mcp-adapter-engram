@@ -1,0 +1,24 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-sentry-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/sentry@sha256:f38467297a1ed273009e0ad85bd0fc9f4ce44578114be0f349d6333c5000558b"
+      imagePullPolicy: IfNotPresent
+      command:
+        - --auth-token
+        - $SENTRY_AUTH_TOKEN
+      useEphemeralSecret: true
+  mcp:
+    initClientCapabilities: {}
+  secrets:
+    server: "sentry-mcp-secrets"
