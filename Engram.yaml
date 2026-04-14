@@ -1,0 +1,236 @@
+apiVersion: catalog.bubustack.io/v1alpha1
+kind: EngramTemplate
+metadata:
+  name: mcp-adapter
+  annotations:
+    registry.bubustack.io/maturity: experimental
+spec:
+  version: 0.1.0
+  description: "Connects to an external MCP server over Streamable HTTP or manages a stdio runner Pod and attaches via Pods/Attach. Returns raw MCP payloads under output.data.result."
+  image: ghcr.io/bubustack/mcp-adapter-engram:0.1.0
+  supportedModes:
+    - job
+    - deployment
+    - statefulset
+  execution:
+    service:
+      ports:
+        - name: grpc
+          protocol: TCP
+          port: 9000
+          targetPort: 9000
+    rbac:
+      rules:
+        - apiGroups:
+            - ""
+          resources:
+            - pods
+          verbs:
+            - create
+            - delete
+            - get
+            - list
+            - watch
+        - apiGroups:
+            - ""
+          resources:
+            - pods/attach
+          verbs:
+            - create
+  configSchema:
+    type: object
+    properties:
+      transport:
+        type: string
+        enum:
+          - streamable_http
+          - stdio
+        required: true
+        description: "Transport to use for MCP communication. Exactly one active connection per engram instance."
+      server:
+        type: object
+        description: "Configuration for Streamable HTTP transport (external server)."
+        properties:
+          baseURL:
+            type: string
+            description: "Single MCP endpoint supporting POST and GET as per Streamable HTTP."
+            required: true
+          headers:
+            type: object
+            additionalProperties:
+              type: string
+            description: "Additional HTTP headers to include on every request (e.g., Authorization)."
+          headersFromSecret:
+            type: object
+            additionalProperties:
+              type: string
+            description: "Map of HTTP header names to secret references (<bucket>:<key> or <key>) resolved from Engram secrets."
+      stdio:
+        type: object
+        description: "Configuration for stdio transport via a runner Pod (Pods/Attach)."
+        properties:
+          image:
+            type: string
+            description: "Container image to run as the MCP server."
+            required: true
+          imagePullPolicy:
+            type: string
+            enum: [IfNotPresent, Always, Never]
+          command:
+            type: array
+            items:
+              type: string
+          args:
+            type: array
+            items:
+              type: string
+          resources:
+            type: object
+            description: "v1alpha1.WorkloadResources compatible shape."
+            properties:
+              requests:
+                type: object
+                properties:
+                  cpu:
+                    type: string
+                  memory:
+                    type: string
+                  ephemeralStorage:
+                    type: string
+              limits:
+                type: object
+                properties:
+                  cpu:
+                    type: string
+                  memory:
+                    type: string
+                  ephemeralStorage:
+                    type: string
+          security:
+            type: object
+            description: "v1alpha1.WorkloadSecurity compatible shape."
+            properties:
+              runAsNonRoot:
+                type: boolean
+              allowPrivilegeEscalation:
+                type: boolean
+              readOnlyRootFilesystem:
+                type: boolean
+              runAsUser:
+                type: integer
+          nodeSelector:
+            type: object
+            additionalProperties:
+              type: string
+          tolerations:
+            type: array
+            items:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          podLabels:
+            type: object
+            additionalProperties:
+              type: string
+          podAnnotations:
+            type: object
+            additionalProperties:
+              type: string
+          deletionPolicy:
+            type: string
+            enum: [DeleteOnFinish, Keep]
+            description: "DeleteOnFinish by default."
+          terminationGracePeriodSeconds:
+            type: integer
+          useEphemeralSecret:
+            type: boolean
+            description: "If true, inject secrets via an ephemeral Secret (envFrom)."
+      mcp:
+        type: object
+        properties:
+          initClientCapabilities:
+            type: object
+            description: "Capabilities forwarded in MCP Initialize."
+          postInitDelay:
+            type: string
+            description: "Duration to wait after initialize+ListTools probe, giving MCP servers time to complete async setup (e.g. Discord gateway login). Example: '5s'."
+          callToolRetries:
+            type: integer
+            description: "Number of retry attempts for callTool when the server returns isError:true with a transient message. Default 0 (no retries)."
+          callToolRetryDelay:
+            type: string
+            description: "Delay between callTool retries. Default '2s'."
+    additionalProperties: false
+
+  secretSchema:
+    server:
+      description: "Arbitrary env keys → container env for stdio runner Pod. Streamable HTTP can reference values via server.headersFromSecret."
+      mountType: "env"
+      expectedKeys: []
+
+  inputSchema:
+    type: object
+    properties:
+      action:
+        type: string
+        enum:
+          - listTools
+          - callTool
+          - listResources
+          - readResource
+          - getPrompt
+          - reconcile
+        required: true
+      tool:
+        type: string
+      arguments:
+        type: object
+      pagination:
+        type: object
+        description: "Optional cursor-based pagination for MCP tool calls."
+        properties:
+          cursorParam:
+            type: string
+            description: "Argument name to pass the cursor (e.g., 'cursor')."
+          cursorPath:
+            type: string
+            description: "Path to the next cursor in parsed output (e.g., 'response_metadata.next_cursor')."
+          itemsPath:
+            type: string
+            description: "Path to the array to aggregate across pages (e.g., 'channels')."
+          maxPages:
+            type: integer
+            description: "Maximum number of pages to fetch (default 5)."
+      resourceURI:
+        type: string
+      promptName:
+        type: string
+      timeout:
+        type: string
+      server:
+        type: string
+        description: "Reserved; ignored in v1 (single server)."
+
+  outputSchema:
+    type: object
+    properties:
+      data:
+        type: object
+        properties:
+          result:
+            x-kubernetes-preserve-unknown-fields: true
+            description: "Raw MCP payload, verbatim (object/array/primitive)."
+          resultParsed:
+            x-kubernetes-preserve-unknown-fields: true
+            description: "Parsed JSON payload when the MCP response contains JSON text."
+          meta:
+            type: object
+            properties:
+              server:
+                type: string
+              tool:
+                type: string
+              durationMs:
+                type: integer
+            additionalProperties: true
+          error:
+            x-kubernetes-preserve-unknown-fields: true

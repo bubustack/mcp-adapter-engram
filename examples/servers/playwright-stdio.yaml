@@ -1,0 +1,18 @@
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: "mcp-playwright-stdio"
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: "mcp-adapter"
+  overrides:
+    serviceAccountName: "mcp-adapter-sa"
+  with:
+    transport: stdio
+    stdio:
+      image: "docker.io/mcp/playwright@sha256:e4b2d561b75f67367b46b4719055c28ff96e731a158d3c18775d14d2ccb4545f"
+      imagePullPolicy: IfNotPresent
+  mcp:
+    initClientCapabilities: {}

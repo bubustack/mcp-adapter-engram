@@ -1,0 +1,282 @@
+apiVersion: catalog.bubustack.io/v1alpha1
+kind: EngramTemplate
+metadata:
+  name: mcp-adapter
+spec:
+  version: "0.1.0"
+  description: "Connects to an external MCP server over Streamable HTTP or manages a stdio runner Pod and attaches via Pods/Attach. Returns raw MCP payloads under output.result."
+  image: mcp-adapter
+  supportedModes:
+    - job
+    - deployment
+    - statefulset
+
+  configSchema:
+    type: object
+    properties:
+      transport:
+        type: string
+        enum:
+          - streamable_http
+          - stdio
+        required: true
+        description: "Transport to use for MCP communication. Exactly one active connection per engram instance."
+      server:
+        type: object
+        description: "Configuration for Streamable HTTP transport (external server)."
+        properties:
+          baseURL:
+            type: string
+            description: "Single MCP endpoint supporting POST and GET as per Streamable HTTP."
+            required: true
+      headers:
+        type: object
+        additionalProperties:
+          type: string
+        description: "Additional HTTP headers to include on every request (e.g., Authorization)."
+      headersFromSecret:
+        type: object
+        additionalProperties:
+          type: string
+        description: "Map of HTTP header names to secret references (<bucket>:<key> or <key>) resolved from Engram secrets."
+      stdio:
+        type: object
+        description: "Configuration for stdio transport via a runner Pod (Pods/Attach)."
+        properties:
+          image:
+            type: string
+            description: "Container image to run as the MCP server."
+            required: true
+          imagePullPolicy:
+            type: string
+            enum: [IfNotPresent, Always, Never]
+          command:
+            type: array
+            items:
+              type: string
+          args:
+            type: array
+            items:
+              type: string
+          resources:
+            type: object
+            description: "v1alpha1.WorkloadResources compatible shape."
+            properties:
+              requests:
+                type: object
+                properties:
+                  cpu:
+                    type: string
+                  memory:
+                    type: string
+                  ephemeralStorage:
+                    type: string
+              limits:
+                type: object
+                properties:
+                  cpu:
+                    type: string
+                  memory:
+                    type: string
+                  ephemeralStorage:
+                    type: string
+          security:
+            type: object
+            description: "v1alpha1.WorkloadSecurity compatible shape."
+            properties:
+              runAsNonRoot:
+                type: boolean
+              allowPrivilegeEscalation:
+                type: boolean
+              readOnlyRootFilesystem:
+                type: boolean
+              runAsUser:
+                type: integer
+          nodeSelector:
+            type: object
+            additionalProperties:
+              type: string
+          tolerations:
+            type: array
+            items:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+          podLabels:
+            type: object
+            additionalProperties:
+              type: string
+          podAnnotations:
+            type: object
+            additionalProperties:
+              type: string
+          deletionPolicy:
+            type: string
+            enum: [DeleteOnFinish, Keep]
+            description: "DeleteOnFinish by default."
+          terminationGracePeriodSeconds:
+            type: integer
+          useEphemeralSecret:
+            type: boolean
+            description: "If true, inject secrets via an ephemeral Secret (envFrom)."
+      mcp:
+        type: object
+        properties:
+          initClientCapabilities:
+            type: object
+            description: "Capabilities forwarded in MCP Initialize."
+    additionalProperties: false
+
+  secretSchema:
+    server:
+      description: "Arbitrary env keys → container env for stdio runner Pod. Streamable HTTP can reference values via server.headersFromSecret."
+      mountType: "env"
+
+  inputSchema:
+    type: object
+    properties:
+      action:
+        type: string
+        enum:
+          - listTools
+          - callTool
+          - listResources
+          - readResource
+          - getPrompt
+        required: true
+      tool:
+        type: string
+      arguments:
+        type: object
+      resourceURI:
+        type: string
+      promptName:
+        type: string
+      timeout:
+        type: string
+      server:
+        type: string
+        description: "Reserved; ignored in v1 (single server)."
+
+  outputSchema:
+    type: object
+    properties:
+      result:
+        x-kubernetes-preserve-unknown-fields: true
+        description: "Raw MCP payload, verbatim (object/array/primitive)."
+      server:
+        type: string
+      tool:
+        type: string
+      durationMs:
+        type: integer
+      tools:
+        type: array
+      resources:
+        type: array
+      notifications:
+        type: array
+      error:
+        type: string
+---
+apiVersion: bubustack.io/v1alpha1
+kind: Engram
+metadata:
+  name: mcp-github-batch
+  namespace: default
+spec:
+  mode: job
+  templateRef:
+    name: mcp-adapter
+  overrides:
+    serviceAccountName: mcp-adapter-sa
+  with:
+    transport: stdio
+    stdio:
+      image: ghcr.io/github/github-mcp-server:v0.18.0
+      imagePullPolicy: IfNotPresent
+      useEphemeralSecret: true
+      deletionPolicy: DeleteOnFinish
+    mcp:
+      initClientCapabilities: {}
+  secrets:
+    server: github-mcp-secrets
+---
+apiVersion: bubustack.io/v1alpha1
+kind: Story
+metadata:
+  name: github-batch-e2e
+  namespace: default
+spec:
+  steps:
+  - id: list
+    name: list-tools
+    ref:
+      name: mcp-github-batch
+    with:
+      action: listTools
+
+  - id: create
+    name: create-issue
+    ref:
+      name: mcp-github-batch
+    if: len(steps.list_tools.output.data.result.result.tools) > 0
+    with:
+      action: callTool
+      tool: "issues.create"           # adjust to actual tool name from listTools
+      arguments:
+        owner: "<OWNER>"
+        repo: "<REPO>"
+        title: "MCP adapter batch E2E test"
+        body: "Created via BubuStack MCP adapter (batch)."
+  policy:
+    storage:
+      s3:
+        bucket: github-batch-e2e
+        endpoint: http://seaweedfs-s3.seaweed.svc.cluster.local:8333
+        authentication:
+          secretRef:
+            name: s3-credentials
+---
+apiVersion: runs.bubustack.io/v1alpha1
+kind: StoryRun
+metadata:
+  name: github-batch-e2e
+  namespace: default
+spec:
+  storyRef:
+    name: github-batch-e2e
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mcp-adapter-extra
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create","delete","get","list","watch"]
+- apiGroups: [""]
+  resources: ["pods/attach"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["create","delete","get","list","watch"]
+- apiGroups: ["runs.bubustack.io"]
+  resources: ["stepruns"]
+  verbs: ["get","watch"]
+- apiGroups: ["runs.bubustack.io"]
+  resources: ["stepruns/status"]
+  verbs: ["patch","update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mcp-adapter-extra
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: mcp-adapter-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mcp-adapter-extra

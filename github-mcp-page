@@ -1,0 +1,194 @@
+[
+  {
+    "name": "Nuxt",
+    "link": "https://github.com/mcp/antfu/nuxt-mcp"
+  },
+  {
+    "name": "Monday.com",
+    "link": "https://github.com/mcp/mondaycom/mcp"
+  },
+  {
+    "name": "Hugging Face",
+    "link": "https://github.com/mcp/evalstate/hf-mcp-server"
+  },
+  {
+    "name": "Amplitude",
+    "link": "https://github.com/mcp/amplitude/mcp-server-guide"
+  },
+  {
+    "name": "Apify",
+    "link": "https://github.com/mcp/apify/apify-mcp-server"
+  },
+  {
+    "name": "Atlassian",
+    "link": "https://github.com/mcp/atlassian/atlassian-mcp-server"
+  },
+  {
+    "name": "Axiom",
+    "link": "https://github.com/mcp/axiomhq/mcp"
+  },
+  {
+    "name": "Azure AI Foundry",
+    "link": "https://github.com/mcp/azure-ai-foundry/mcp-foundry"
+  },
+  {
+    "name": "Azure Kubernetes Service",
+    "link": "https://github.com/mcp/azure/aks-mcp"
+  },
+  {
+    "name": "Azure",
+    "link": "https://github.com/mcp/azure/azure-mcp"
+  },
+  {
+    "name": "Box",
+    "link": "https://github.com/mcp/box/mcp-server-box-remote"
+  },
+  {
+    "name": "Chroma",
+    "link": "https://github.com/mcp/chroma-core/chroma-mcp"
+  },
+  {
+    "name": "Chrome DevTools",
+    "link": "https://github.com/mcp/chromedevtools/chrome-devtools-mcp"
+  },
+  {
+    "name": "Codacy",
+    "link": "https://github.com/mcp/codacy/codacy-mcp-server"
+  },
+  {
+    "name": "DeepWiki",
+    "link": "https://github.com/mcp/cognitionai/deepwiki"
+  },
+  {
+    "name": "Unity",
+    "link": "https://github.com/mcp/coplaydev/unity-mcp"
+  },
+  {
+    "name": "Todoist",
+    "link": "https://github.com/mcp/doist/todoist-ai"
+  },
+  {
+    "name": "Dynatrace",
+    "link": "https://github.com/mcp/dynatrace-oss/dynatrace-mcp"
+  },
+  {
+    "name": "Elasticsearch",
+    "link": "https://github.com/mcp/elastic/mcp-server-elasticsearch"
+  },
+  {
+    "name": "Figma",
+    "link": "https://github.com/mcp/figma/mcp-server-guide"
+  },
+  {
+    "name": "Firecrawl",
+    "link": "https://github.com/mcp/firecrawl/firecrawl-mcp-server"
+  },
+  {
+    "name": "Sentry",
+    "link": "https://github.com/mcp/getsentry/sentry-mcp"
+  },
+  {
+    "name": "GitHub",
+    "link": "https://github.com/mcp/github/github-mcp-server"
+  },
+  {
+    "name": "Terraform",
+    "link": "https://github.com/mcp/hashicorp/terraform-mcp-server"
+  },
+  {
+    "name": "Intercom",
+    "link": "https://github.com/mcp/intercom/intercom-mcp-server"
+  },
+  {
+    "name": "JFrog",
+    "link": "https://github.com/mcp/jfrog/jfrog-mcp-server"
+  },
+  {
+    "name": "Launchdarkly",
+    "link": "https://github.com/mcp/launchdarkly/mcp-server"
+  },
+  {
+    "name": "Notion",
+    "link": "https://github.com/mcp/makenotion/notion-mcp-server"
+  },
+  {
+    "name": "Azure DevOps",
+    "link": "https://github.com/mcp/microsoft/azure-devops-mcp"
+  },
+  {
+    "name": "Clarity",
+    "link": "https://github.com/mcp/microsoft/clarity-mcp-server"
+  },
+  {
+    "name": "Dev Box",
+    "link": "https://github.com/mcp/microsoft/devbox-mcp-server"
+  },
+  {
+    "name": "Fabric Real-Time Intelligence",
+    "link": "https://github.com/mcp/microsoft/fabric-rti-mcp"
+  },
+  {
+    "name": "Markitdown",
+    "link": "https://github.com/mcp/microsoft/markitdown"
+  },
+  {
+    "name": "Playwright",
+    "link": "https://github.com/mcp/microsoft/playwright-mcp"
+  },
+  {
+    "name": "Microsoft Learn",
+    "link": "https://github.com/mcp/microsoftdocs/mcp"
+  },
+  {
+    "name": "Mongodb",
+    "link": "https://github.com/mcp/mongodb-js/mongodb-mcp-server"
+  },
+  {
+    "name": "Neon",
+    "link": "https://github.com/mcp/neondatabase/mcp-server-neon"
+  },
+  {
+    "name": "Octopus Deploy",
+    "link": "https://github.com/mcp/octopusdeploy/mcp-server"
+  },
+  {
+    "name": "Serena",
+    "link": "https://github.com/mcp/oraios/serena"
+  },
+  {
+    "name": "PagerDuty",
+    "link": "https://github.com/mcp/pagerduty/pagerduty-mcp-server"
+  },
+  {
+    "name": "Postman",
+    "link": "https://github.com/mcp/postmanlabs/postman-mcp-server"
+  },
+  {
+    "name": "Logfire",
+    "link": "https://github.com/mcp/pydantic/logfire-mcp"
+  },
+  {
+    "name": "StackHawk",
+    "link": "https://github.com/mcp/stackhawk/stackhawk-mcp"
+  },
+  {
+    "name": "Stripe",
+    "link": "https://github.com/mcp/stripe/agent-toolkit"
+  },
+  {
+    "name": "Imagesorcery",
+    "link": "https://github.com/mcp/sunriseapps/imagesorcery-mcp"
+  },
+  {
+    "name": "Context7",
+    "link": "https://github.com/mcp/upstash/context7"
+  },
+  {
+    "name": "Webflow",
+    "link": "https://github.com/mcp/webflow/mcp-server"
+  },
+  {
+    "name": "Zapier",
+    "link": "https://github.com/mcp/zapier/zapier-mcp"
+  }
+]
